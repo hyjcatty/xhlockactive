@@ -23,7 +23,7 @@ export default class activateview extends Component {
             title_height:210,
             button_height:350,
             note_height:140,
-            activated:true,
+            activated:false,
             notes:"Not Activate",
             cycle:30,
             interval:0
