@@ -11,6 +11,7 @@ import classNames from 'classnames';
 import Foot from "../foot/foot"
 import Head from "../head/head"
 import Activateview from "../container/activateview/activateview"
+import Uploadview from "../container/Uploadview/Uploadview"
 import './App.css';
 
 import fetch from 'isomorphic-fetch';
@@ -46,9 +47,10 @@ class App extends Component{
         this.refs.head.update_size(headfootheight);
         this.refs.foot.update_size(headfootheight);
         this.refs.Activateview.update_size(width,canvasheight);
+        this.refs.Uploadview.update_size(width,canvasheight);
     }
-    initializehead(){
-        this.refs.head.update_username(this.state.username);
+    initializehead(id){
+        this.refs.head.update_username(id);
     }
     initializefoot(callback){
         this.refs.foot.update_callback(callback);
@@ -62,6 +64,14 @@ class App extends Component{
     updateactivenotes(notes){
         this.refs.Activateview.update_notes(notes);
     }
+    showactiveview(){
+        this.refs.Uploadview.hide();
+        this.refs.Activateview.show();
+    }
+    showuploadview(){
+        this.refs.Activateview.hide();
+        this.refs.Uploadview.show();
+    }
     buttonlock(input){
         this.refs.foot.disable(input);
     }
@@ -72,6 +82,7 @@ class App extends Component{
                 <Head ref="head"/>
             </div>
             <div>
+                <Uploadview ref="Uploadview"/>
                 <Activateview ref="Activateview"/>
             </div>
             <div>
@@ -84,22 +95,32 @@ class App extends Component{
 
 }
 
+
+
+
 get_size();
 var wechat_id = getWechatScope();
 var react_element = <App/>;
 var app_handle = ReactDOM.render(react_element,document.getElementById('app'));
+var cycle_number = 0;
+var Intervalhandle;
+var basic_address = getRelativeURL()+"/";
+var upload_url=basic_address+"upload.php";
 
-
+$('#file-zh').fileinput({
+    language: 'zh',
+    uploadUrl: upload_url+"?id="+wechat_id,
+    allowedFileExtensions : ['jpg', 'png','gif'],
+    showPreview : true,
+    maxFileSize:5000
+});
 //app_handle.initializebuttonlock(lockbuttoncallback);
 //app_handle.initializeUrl(request_head);
 app_handle.initializeSize(winWidth,winHeight);
-
 app_handle.updateactivecode(wechat_id);
+app_handle.initializehead(wechat_id);
+app_handle.showuploadview();
 
-
-
-
-app_handle.initializehead();
 getLocation();
 
 
@@ -143,36 +164,50 @@ function getRelativeURL(){
 }
 function getLocation()
 {
+    //alert("正在获取位置！");
     app_handle.updateactivenotes("正在获取位置！");
     if (navigator.geolocation)
     {
         navigator.geolocation.getCurrentPosition(showPosition);
     }
     else{
+        app_handle.showactiveview();
         app_handle.updateactivenotes("无法获得当前位置！");
+        alert("无法获得当前位置！");
     }
 }
 function showPosition(position)
 {
+    //alert("获取位置！");
     console.log("Latitude: " + position.coords.latitude +
         "Longitude: " + position.coords.longitude);
     Latitude = position.coords.latitude;
     Longitude = position.coords.longitude;
-    fetchactivate();
+    //fetchactivate();
+
+    Intervalhandle= setInterval(function() {
+        if(cycle_number >=100) return;
+        fetchactivate();
+        cycle_number++;
+    }, 3000);
 }
 function query_callback(res){
     if(res.jsonResult.status == "false"){
-        app_handle.updateactivestatus(false);
-        app_handle.updateactivenotes("激活失败:"+res.jsonResult.msg);
+        //app_handle.updateactivestatus(false);
+        //app_handle.updateactivenotes("激活失败:"+res.jsonResult.msg);
         return;
     }
     if(res.jsonResult.auth == "false"){
         app_handle.updateactivestatus(false);
         app_handle.updateactivenotes("激活失败:"+res.jsonResult.msg);
+        cycle_number = 101;
         return;
     }
+    app_handle.showactiveview();
     app_handle.updateactivestatus(true);
     app_handle.updateactivenotes("设备已激活！");
+    //alert("设备已激活！");
+    cycle_number = 101;
     return;
 
 }

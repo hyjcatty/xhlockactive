@@ -26,7 +26,8 @@ export default class activateview extends Component {
             activated:false,
             notes:"Not Activate",
             cycle:30,
-            interval:0
+            interval:0,
+            hide:"block",
         }
     }
     update_size(width,height){
@@ -42,7 +43,12 @@ export default class activateview extends Component {
     update_status(status){
         this.setState({activated:status});
     }
-
+    hide(){
+        this.setState({hide:"none"});
+    }
+    show(){
+        this.setState({hide:"block"});
+    }
     render() {
         let pad_value = this.state.height/50+"px "+this.state.height*0.1+"px";
         let button = <i className="fa fa-check" style={{padding:pad_value }}></i>;

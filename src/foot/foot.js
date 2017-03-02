@@ -22,7 +22,7 @@ export default class foot extends Component {
         super(props);
         this.state={
             height:50,
-            content:"Designed by HYJ",
+            content:"©上海阜华",
             hide:"none",
             callback:null,
             disabled:""

@@ -14,6 +14,7 @@ var concat = require('gulp-concat');
 var rename = require('gulp-rename');
 var clean = require('gulp-clean');
 var htmlmin = require('gulp-htmlmin');
+var mkdirp = require('mkdirp');
 var option = {
 
     buildPath: "../www/lockactive"
@@ -65,6 +66,17 @@ gulp.task("resourcecopy",function(){
 
     gulp.src("./build/resource/**/*")
         .pipe(gulp.dest(option.buildPath+"/resource/"));
+    gulp.src("./resource/js/*")
+        .pipe(gulp.dest(option.buildPath+"/resource/js/"));
+    gulp.src("./resource/css/*")
+        .pipe(gulp.dest(option.buildPath+"/resource/css/"));
+    gulp.src("./resource/img/*")
+        .pipe(gulp.dest(option.buildPath+"/resource/img/"));
+    gulp.src("./resource/image/*")
+        .pipe(gulp.dest(option.buildPath+"/resource/image/"));
+    gulp.src("./resource/fonts/g*")
+        .pipe(gulp.dest(option.buildPath+"/resource/fonts/"));
+    mkdirp.sync(option.buildPath+"/upload/");
     /*
     gulp.src("./*.html")
        .pipe(gulp.dest(option.buildPath+"/"));*/

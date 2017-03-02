@@ -1,5 +1,16 @@
 <?php
 header("Content-type:text/html;charset=utf-8");
+function _getfilecounts($ff){
+    if(!file_exists($ff)) return 0;
+    $handle = opendir($ff);
+    $i=0;
+    while(false !== $file=(readdir($handle))){
+        if($file !== "." && $file!=".."){
+            $i++;
+        }
+    }
+    return $i;
+}
 function _encode($arr)
 {
   $na = array();
@@ -116,8 +127,11 @@ switch ($key){
     case "HCU_Lock_Activate": //Open a lock
             $body=$payload["body"];
             $code=$body["code"];
+            $ret_stat = "false";
+            $i=_getfilecounts('./upload/'.$code.'/');
+            if($i>=2) $ret_stat = "true";
             $retval=array(
-                'status'=>'true',
+                'status'=>$ret_stat,
                 'auth'=>'true',
                 'msg'=>'123456'
             );
