@@ -110,7 +110,7 @@ var upload_url=basic_address+"upload.php";
 $('#file-zh').fileinput({
     language: 'zh',
     uploadUrl: upload_url+"?id="+wechat_id,
-    allowedFileExtensions : ['jpg', 'png','gif'],
+    allowedFileExtensions : ['jpg','jpeg','JPG' ,'JPEG','png','PNG'],
     showPreview : true,
     maxFileSize:5000
 });
@@ -179,10 +179,17 @@ function getLocation()
 function showPosition(position)
 {
     //alert("获取位置！");
+    var TO_BLNG = function(lng){return lng+0.0065;};
+
+    var TO_BLAT = function(lat){return lat+0.0060;};
+
+    var TO_GLNG = function(lng){return lng-0.0065;};
+
+    var TO_GLAT = function(lat){return lat-0.0060;};
     console.log("Latitude: " + position.coords.latitude +
         "Longitude: " + position.coords.longitude);
-    Latitude = position.coords.latitude;
-    Longitude = position.coords.longitude;
+    Latitude = TO_BLAT(position.coords.latitude);
+    Longitude = TO_BLNG(position.coords.longitude);
     //fetchactivate();
 
     Intervalhandle= setInterval(function() {
