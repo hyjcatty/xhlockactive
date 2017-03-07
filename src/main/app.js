@@ -166,6 +166,7 @@ function getLocation()
 {
     //alert("正在获取位置！");
     app_handle.updateactivenotes("正在获取位置！");
+    /*
     if (navigator.geolocation)
     {
         navigator.geolocation.getCurrentPosition(showPosition);
@@ -174,22 +175,50 @@ function getLocation()
         app_handle.showactiveview();
         app_handle.updateactivenotes("无法获得当前位置！");
         alert("无法获得当前位置！");
-    }
+    }*/
+
+    let bmap = new BMap.Map("GuildMap");
+    var t_point = new BMap.Point(116.501573, 39.900877);
+    bmap.centerAndZoom(t_point,15);
+    var geoc = new BMap.Geocoder();
+    var geolocation = new BMap.Geolocation();
+    geolocation.getCurrentPosition(function(r){
+        if(this.getStatus() == BMAP_STATUS_SUCCESS){
+            let coords = {
+                latitude:r.point.lat ,longitude:r.point.lng
+            }
+            let postion = {
+                coords:coords
+            }
+            showPosition(postion);
+            //var mk = new BMap.Marker(r.point);
+            //map.addOverlay(mk);
+            //map.panTo(r.point);
+            //$("#start_point").val(r.point.lng+','+r.point.lat);
+            //alert("当前位置经度为:"+r.point.lng+"纬度为:"+r.point.lat);
+        }else {
+            console.log("无法获得当前位置！");
+            alert("无法获得当前位置！");
+        }
+    },{enableHighAccuracy: true});
 }
 function showPosition(position)
 {
     //alert("获取位置！");
-    var TO_BLNG = function(lng){return lng+0.0065;};
 
-    var TO_BLAT = function(lat){return lat+0.0060;};
+    //var TO_BLNG = function(lng){return lng+0.0065;};
 
-    var TO_GLNG = function(lng){return lng-0.0065;};
+    //var TO_BLAT = function(lat){return lat+0.0060;};
 
-    var TO_GLAT = function(lat){return lat-0.0060;};
+    //var TO_GLNG = function(lng){return lng-0.0065;};
+
+    //var TO_GLAT = function(lat){return lat-0.0060;};
     console.log("Latitude: " + position.coords.latitude +
         "Longitude: " + position.coords.longitude);
-    Latitude = TO_BLAT(position.coords.latitude);
-    Longitude = TO_BLNG(position.coords.longitude);
+    //Latitude = TO_BLAT(position.coords.latitude);
+    //Longitude = TO_BLNG(position.coords.longitude);
+    Latitude = (position.coords.latitude);
+    Longitude = (position.coords.longitude);
     //fetchactivate();
 
     Intervalhandle= setInterval(function() {
