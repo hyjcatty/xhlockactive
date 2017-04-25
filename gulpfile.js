@@ -15,6 +15,8 @@ var rename = require('gulp-rename');
 var clean = require('gulp-clean');
 var htmlmin = require('gulp-htmlmin');
 var mkdirp = require('mkdirp');
+var replace = require('gulp-replace');
+var replace_content = "D:/webrd/www/lockactive/upload/";
 var option = {
 
     buildPath: "../www/lockactive"
@@ -55,7 +57,10 @@ gulp.task("resourcecopy",function(){
         .pipe(gulp.dest(option.buildPath+"/js/"));
     gulp.src("./css/*")
         .pipe(gulp.dest(option.buildPath+"/css/"));*/
-    gulp.src("./*.php")
+    gulp.src("./request.php")
+        .pipe(gulp.dest(option.buildPath+"/"));
+    gulp.src("./upload.php")
+        .pipe(replace(/_UPLOAD_PATH_/,replace_content))
         .pipe(gulp.dest(option.buildPath+"/"));
     /*
     gulp.src("./*.ico")
