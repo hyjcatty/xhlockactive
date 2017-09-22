@@ -17,7 +17,7 @@ import './listview.css';
 
 
 
-export default class unlockview extends Component {
+export default class listview extends Component {
     constructor(props) {
         super(props);
         this.state={

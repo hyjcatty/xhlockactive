@@ -12,6 +12,7 @@ import Foot from "../foot/foot"
 import Head from "../head/head"
 import Activateview from "../container/activateview/activateview"
 import Uploadview from "../container/Uploadview/Uploadview"
+import Stationview from "../container/stationview/stationview"
 import './App.css';
 
 import fetch from 'isomorphic-fetch';
@@ -48,12 +49,21 @@ class App extends Component{
         this.refs.foot.update_size(headfootheight);
         this.refs.Activateview.update_size(width,canvasheight);
         this.refs.Uploadview.update_size(width,canvasheight);
+        this.refs.Stationview.update_size(width,canvasheight);
     }
     initializehead(id){
         this.refs.head.update_username(id);
     }
     initializefoot(callback){
         this.refs.foot.update_callback(callback);
+    }
+    initializestation(projlist,statlist,callback){
+        this.refs.Stationview.update_freestationlist(statlist);
+        this.refs.Stationview.update_projlist(projlist);
+        this.refs.Stationview.updatecallback(callback);
+    }
+    getSelectedStat(){
+        return this.refs.Stationview.getSelectedStat();
     }
     updateactivestatus(status){
         this.refs.Activateview.update_status(status);
@@ -65,12 +75,19 @@ class App extends Component{
         this.refs.Activateview.update_notes(notes);
     }
     showactiveview(){
+        this.refs.Stationview.hide();
         this.refs.Uploadview.hide();
         this.refs.Activateview.show();
     }
     showuploadview(){
+        this.refs.Stationview.hide();
         this.refs.Activateview.hide();
         this.refs.Uploadview.show();
+    }
+    showstationview(){
+        this.refs.Stationview.show();
+        this.refs.Activateview.hide();
+        this.refs.Uploadview.hide();
     }
     buttonlock(input){
         this.refs.foot.disable(input);
@@ -84,6 +101,7 @@ class App extends Component{
             <div>
                 <Uploadview ref="Uploadview"/>
                 <Activateview ref="Activateview"/>
+                <Stationview ref="Stationview"/>
             </div>
             <div>
                 <Foot ref="foot"/>
@@ -99,6 +117,11 @@ class App extends Component{
 
 
 get_size();
+var project_list = [];
+var free_station =[];
+
+//fetchFreeStation();
+
 var wechat_id = getWechatScope();
 var react_element = <App/>;
 var app_handle = ReactDOM.render(react_element,document.getElementById('app'));
@@ -106,7 +129,7 @@ var cycle_number = 0;
 var Intervalhandle;
 var basic_address = getRelativeURL()+"/";
 var upload_url=basic_address+"upload.php";
-
+fetchProjectList();
 $('#file-zh').fileinput({
     language: 'zh',
     uploadUrl: upload_url+"?id="+wechat_id,
@@ -119,8 +142,8 @@ $('#file-zh').fileinput({
 app_handle.initializeSize(winWidth,winHeight);
 app_handle.updateactivecode(wechat_id);
 app_handle.initializehead(wechat_id);
-app_handle.showuploadview();
-
+//app_handle.showuploadview();
+app_handle.showstationview();
 getLocation();
 
 
@@ -251,8 +274,11 @@ function jsonParse(res) {
     return res.json().then(jsonResult => ({ res, jsonResult }));
 }
 function fetchactivate(){
+    //console.log(app_handle.getSelectedStat());
+    if(app_handle.getSelectedStat() == "--") return;
     let body={
         code:wechat_id,
+        StatCode:app_handle.getSelectedStat(),
         latitude:""+Latitude,
         longitude:""+Longitude
     };
@@ -276,6 +302,66 @@ function fetchactivate(){
             console.log('request error', error);
             return { error };
         });
+}
+
+function fetchProjectList(){
+    var listreq={
+        action:"ProjectList",
+        type:"query",
+        user:"activeuser"
+    };
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(listreq)
+        }).then(jsonParse)
+        .then(fetchProjectListcallback)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function fetchProjectListcallback(res){
+    project_list = res.jsonResult.ret;
+    fetchFreeStation();
+    return;
+
+}
+function fetchFreeStation(){
+    var listreq={
+        action:"HCU_Get_Free_Station",
+        type:"query",
+        user:"activeuser"
+    };
+    fetch(request_head,
+        {
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify(listreq)
+        }).then(jsonParse)
+        .then(fetchFreeStationcallback)
+        .catch( (error) => {
+            console.log('request error', error);
+            return { error };
+        });
+}
+function changeview(){
+    app_handle.showuploadview();
+}
+function fetchFreeStationcallback(res){
+    free_station = res.jsonResult.ret;
+    //console.log(free_station);
+    //console.log(project_list);
+    app_handle.initializestation(project_list,free_station,changeview);
+    return;
+
 }
 function getWechatScope(){
     var url = document.location.toString();

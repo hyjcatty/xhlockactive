@@ -123,6 +123,55 @@ switch ($key){
             );
             $jsonencode = _encode($retval);
             echo $jsonencode; break;
+    case "HCU_Get_Free_Station":
+
+        $pointtable = array();
+    	for($i=0;$i<20;$i++){
+
+    	    $projcode = ($i)%14;
+    		$temp = array(
+    			'StatCode'=> (string)(($i+1)),
+    			'StatName'=>"测量点".(string)($i),
+    			'ProjCode'=> $projcode,
+    			'ChargeMan'=>"用户".(string)($i),
+    			'Telephone'=>"139139".(string)($i),
+    			'Longitude'=>"121.0000",
+    			'Latitude'=>"31.0000",
+    			'Department'=>"单位".(string)($i),
+    			'Address'=>"地址".(string)($i),
+    			'Country'=>"区县".(string)($i),
+    			'Street'=>"街镇".(string)($i),
+    			'Square'=>"10000",
+    			'ProStartTime'=>"2016-01-01",
+    			'Stage'=>"备注".(string)($i)
+    		);
+    		array_push($pointtable,$temp);
+    	}
+        $retval=array(
+            'status'=>'true',
+            'ret'=>$pointtable,
+            'auth'=>'true',
+            'msg'=>'123456'
+        );
+        $jsonencode = _encode($retval);
+        echo $jsonencode; break;
+    case "ProjectList":
+    	$projlist = array();
+    	for($i=0;$i<14;$i++){
+    		$temp = array(
+    			'id'=> (string)($i),
+    			'name'=> "项目".(string)$i
+    		);
+    		array_push($projlist,$temp);
+    	}
+    	$retval=array(
+    		'status'=>'true',
+    		'ret'=> $projlist,
+    		'auth'=>'true',
+    		'msg'=>''
+    	);
+    	$jsonencode = _encode($retval);
+    	echo $jsonencode; break;
     case "HCU_Lock_close": //Close a lock
     case "HCU_Lock_Activate": //Open a lock
             $body=$payload["body"];
